@@ -1,0 +1,80 @@
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int value;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+TreeNode* createNode(int val) {
+    TreeNode* t = new TreeNode();
+    t->value = val;
+    t->left = t->right = NULL;
+    return t;
+}
+
+TreeNode* insert(TreeNode* root, int val) {
+    if (root == NULL)
+        return createNode(val);
+
+    if (val < root->value)
+        root->left = insert(root->left, val);
+    else
+        root->right = insert(root->right, val);
+
+    return root;
+}
+
+bool validateBST(TreeNode* root, int& lastVal, bool& isFirst) {
+    if (root == NULL) return true;
+
+    if (!validateBST(root->left, lastVal, isFirst))
+        return false;
+
+    if (!isFirst && root->value <= lastVal)
+        return false;
+
+    lastVal = root->value;
+    isFirst = false;
+
+    return validateBST(root->right, lastVal, isFirst);
+}
+
+bool checkBST(TreeNode* root) {
+    int lastVal = 0;
+    bool isFirst = true;
+    return validateBST(root, lastVal, isFirst);
+}
+
+void inOrder(TreeNode* root) {
+    if (root == NULL) return;
+    inOrder(root->left);
+    cout << root->value << " ";
+    inOrder(root->right);
+}
+
+int main() {
+    TreeNode* root = NULL;
+    int count, val;
+
+    cout << "enter number of nodes: ";
+    cin >> count;
+
+    cout << "enter values:\n";
+    for (int i = 0; i < count; i++) {
+        cin >> val;
+        root = insert(root, val);
+    }
+
+    cout << "inorder: ";
+    inOrder(root);
+    cout << endl;
+
+    if (checkBST(root))
+        cout << "valid binary search tree\n";
+    else
+        cout << "invalid binary search tree\n";
+
+    return 0;
+}
