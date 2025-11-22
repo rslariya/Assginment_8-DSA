@@ -1,0 +1,118 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* newNode(int value) {
+    Node* t = new Node();
+    t->data = value;
+    t->left = t->right = NULL;
+    return t;
+}
+
+Node* insertNode(Node* root, int value) {
+    if (root == NULL)
+        return newNode(value);
+
+    if (value < root->data)
+        root->left = insertNode(root->left, value);
+    else if (value > root->data)
+        root->right = insertNode(root->right, value);
+
+    return root;
+}
+
+Node* findMin(Node* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+Node* deleteNode(Node* root, int key) {
+    if (root == NULL)
+        return root;
+
+    if (key < root->data)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->data)
+        root->right = deleteNode(root->right, key);
+    else {
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        }
+        else if (root->right == NULL) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        Node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+
+    return root;
+}
+
+int maxDepth(Node* root) {
+    if (root == NULL) return 0;
+    int l = maxDepth(root->left);
+    int r = maxDepth(root->right);
+    return (l > r ? l : r) + 1;
+}
+
+int minDepth(Node* root) {
+    if (root == NULL) return 0;
+
+    int l = minDepth(root->left);
+    int r = minDepth(root->right);
+
+    if (l == 0) return r + 1;
+    if (r == 0) return l + 1;
+
+    return (l < r ? l : r) + 1;
+}
+
+void inorder(Node* root) {
+    if (root == NULL) return;
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
+}
+
+int main() {
+    Node* root = NULL;
+    int n, x;
+
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    cout << "Enter elements:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        root = insertNode(root, x);
+    }
+
+    cout << "Inorder: ";
+    inorder(root);
+    cout << endl;
+
+    cout << "Enter element to delete: ";
+    cin >> x;
+    root = deleteNode(root, x);
+
+    cout << "Inorder after deletion: ";
+    inorder(root);
+    cout << endl;
+
+    cout << "Maximum depth: " << maxDepth(root) << endl;
+    cout << "Minimum depth: " << minDepth(root) << endl;
+
+    return 0;
+}
