@@ -1,0 +1,168 @@
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int value;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+TreeNode* createNode(int val) {
+    TreeNode* temp = new TreeNode();
+    temp->value = val;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+
+TreeNode* insert(TreeNode* root, int val) {
+    if (root == NULL)
+        return createNode(val);
+
+    if (val < root->value)
+        root->left = insert(root->left, val);
+    else
+        root->right = insert(root->right, val);
+
+    return root;
+}
+
+TreeNode* searchRec(TreeNode* root, int key) {
+    if (root == NULL || root->value == key)
+        return root;
+
+    if (key < root->value)
+        return searchRec(root->left, key);
+    return searchRec(root->right, key);
+}
+
+TreeNode* searchNonRec(TreeNode* root, int key) {
+    while (root != NULL) {
+        if (root->value == key)
+            return root;
+
+        if (key < root->value)
+            root = root->left;
+        else
+            root = root->right;
+    }
+    return NULL;
+}
+
+int getMax(TreeNode* root) {
+    if (root == NULL) return -1;
+    while (root->right != NULL)
+        root = root->right;
+    return root->value;
+}
+
+int getMin(TreeNode* root) {
+    if (root == NULL) return -1;
+    while (root->left != NULL)
+        root = root->left;
+    return root->value;
+}
+
+TreeNode* getMinNode(TreeNode* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+TreeNode* getMaxNode(TreeNode* root) {
+    while (root->right != NULL)
+        root = root->right;
+    return root;
+}
+
+TreeNode* findSuccessor(TreeNode* root, int key) {
+    TreeNode* curr = root;
+    TreeNode* candidate = NULL;
+
+    while (curr != NULL) {
+        if (key < curr->value) {
+            candidate = curr;
+            curr = curr->left;
+        } else if (key > curr->value) {
+            curr = curr->right;
+        } else {
+            break;
+        }
+    }
+
+    if (curr == NULL)
+        return NULL;
+
+    if (curr->right != NULL)
+        return getMinNode(curr->right);
+
+    return candidate;
+}
+
+TreeNode* findPredecessor(TreeNode* root, int key) {
+    TreeNode* curr = root;
+    TreeNode* candidate = NULL;
+
+    while (curr != NULL) {
+        if (key > curr->value) {
+            candidate = curr;
+            curr = curr->right;
+        } else if (key < curr->value) {
+            curr = curr->left;
+        } else {
+            break;
+        }
+    }
+
+    if (curr == NULL)
+        return NULL;
+
+    if (curr->left != NULL)
+        return getMaxNode(curr->left);
+
+    return candidate;
+}
+
+int main() {
+    TreeNode* root = NULL;
+    int count, val;
+
+    cout << "enter number of elements: ";
+    cin >> count;
+
+    cout << "enter elements:\n";
+    for (int i = 0; i < count; i++) {
+        cin >> val;
+        root = insert(root, val);
+    }
+
+    int key;
+    cout << "\nenter key to search: ";
+    cin >> key;
+
+    if (searchRec(root, key))
+        cout << "found (recursive)\n";
+    else
+        cout << "not found (recursive)\n";
+
+    if (searchNonRec(root, key))
+        cout << "found (non-recursive)\n";
+    else
+        cout << "not found (non-recursive)\n";
+
+    cout << "minimum: " << getMin(root) << endl;
+    cout << "maximum: " << getMax(root) << endl;
+
+    TreeNode* successor = findSuccessor(root, key);
+    if (successor)
+        cout << "successor: " << successor->value << endl;
+    else
+        cout << "no successor\n";
+
+    TreeNode* predecessor = findPredecessor(root, key);
+    if (predecessor)
+        cout << "predecessor: " << predecessor->value << endl;
+    else
+        cout << "no predecessor\n";
+
+    return 0;
+}
